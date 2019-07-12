@@ -33,7 +33,7 @@ for line in f:
         #  =  <short_name> <long_name> 
         name = text[2:29].lower().strip()
         sortingFlag = text[29] # +,-; ignore +
-        unsortedf = text[30:-2]
+        unsortedf = text[30:85]
         frequencies = split(unsortedf)
     
         if sortingFlag != '+':
