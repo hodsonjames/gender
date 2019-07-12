@@ -8,19 +8,34 @@ Created on Tue Jul  9 15:03:40 2019
 
 f = open('C:/Users/tickc/OneDrive/Documents/GitHub/gender/data/nam_dict.txt')
 
+countries = u"""great_britain ireland usa italy malta portugal spain france
+                   belgium luxembourg the_netherlands east_frisia germany austria
+                   swiss iceland denmark norway sweden finland estonia latvia
+                   lithuania poland czech_republic slovakia hungary romania
+                   bulgaria bosniaand croatia kosovo macedonia montenegro serbia
+                   slovenia albania greece russia belarus moldova ukraine armenia
+                   azerbaijan georgia the_stans turkey arabia israel china india
+                   japan korea vietnam other_countries
+                 """.split()
+
 genderDict = {}
 shortNames = []
 count = 0 
 
+def split(values): 
+    return [char for char in values] 
+#using .split() will give incorrect values since it does not split whitespace
+    
 for line in f:
-    if count >= 364:
+    if count >= 362:
         text = line[0:86]
         mf = text[:2].strip() # M,1M,?M, F,1F,?F, ?, =
         #  =  <short_name> <long_name> 
         name = text[2:29].lower().strip()
         sortingFlag = text[29] # +,-; ignore +
-        frequencies = text[30:-2]
-
+        unsortedf = text[30:-2]
+        frequencies = split(unsortedf)
+    
         if sortingFlag != '+':
                     if mf == '=':
                         shortNames.append([name, frequencies])
