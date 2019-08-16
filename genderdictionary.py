@@ -1,5 +1,4 @@
 
-
 import csv
 with open('C:/Users/tickc/OneDrive/Documents/GitHub/gender/data/country_pop.csv') as g:
     pop = dict(filter(None, csv.reader(g)))
@@ -8,6 +7,8 @@ f = open('C:/Users/tickc/OneDrive/Documents/GitHub/gender/data/nam_dict.txt')
 
 g = open('C:/Users/tickc/OneDrive/Documents/GitHub/gender/data/male.txt','r')
 h = open('C:/Users/tickc/OneDrive/Documents/GitHub/gender/data/female.txt','r')
+
+
 
 countries = u"""great_britain ireland usa italy malta portugal spain france
                    belgium luxembourg the_netherlands east_frisia germany austria
@@ -19,28 +20,21 @@ countries = u"""great_britain ireland usa italy malta portugal spain france
                    japan korea vietnam other_countries
                  """.split()
 
+
 genderDict = {}
-usdict = {}
-usfemaledict = {}
 shortNames = []
+
+listmale = []
+listfem =[]
+
+accuracylist = []
+valuelist = []
+
 count = 0 
 
 
-with g as document:    
-    for line in document:
-        if line.strip():            
-            key, value = line.split(None, 1)
-            key = key.lower()
-            usdict[key] = value.split()           
- 
-with h as document:    
-    for line in document:
-        if line.strip():            
-            key, value = line.split(None, 1)
-            key = key.lower()
-            usfemaledict[key] = value.split()    
 
-usdict.update(usfemaledict)      
+
 
 def split(values): 
     return [char for char in values] 
@@ -74,7 +68,7 @@ for line in f:
                                     
                             for country,freq in zip(countries,frequencies):
                                 if freq != ' ':
-                                    norm_freq = int((float(pop[country]) * 1000) * (2 ** (int(freq,16) - 10)))
+                                    norm_freq = int((float(pop[country]) * 1000) * 0.02 * (2 ** (int(freq,16) - 10)))
                                     #norm_freq = int(((float(pop[country]))*1000) * (math.log(int(freq,16))))
                                     # print(int(float(pop[country]) * 1000)) 
                                     # print((math.log(int(freq,16),2)))
@@ -100,16 +94,110 @@ for [name, frequencies] in shortNames:
                 genderDict[shortName] = [nameList]
                 
                 
-frequencyDict = {}
-for i in genderDict:   
-    for j in genderDict[i]:          
-        for k in genderDict[i][j]:            
-            freq = genderDict[i][j][k]
-            if freq in frequencyDict:
-                frequencyDict[freq] += 1
-            else:
-                frequencyDict[freq] = 1
+#frequencyDict = {}
+#for i in genderDict:   
+#    for j in genderDict[i]:          
+#        for k in genderDict[i][j]:            
+#            freq = genderDict[i][j][k]
+#            if freq in frequencyDict:
+#                frequencyDict[freq] += 1
+#            else:
+#                frequencyDict[freq] = 1
+#
+#russianpop = 0
+#for name in genderDict:
+#    for gender in genderDict[name]:
+#        if 'russia' in genderDict[name][gender]:
+#            russianpop += genderDict[name][gender]['russia']
+#print(russianpop)
 
+#Sorts names for male and female with values 
+for key in genderDict.keys():
+        if 'M' in genderDict[key]:
+            listmale.append(key) 
+        else:
+            if 'F' in genderDict[key]:
+                listfem.append(key) 
+                  
+import nltk
+import random
+
+testname = 'Phillip'
+
+#extracts features from labeled_names names 
+def extract_features(name):
+    
+    name = name.lower()
+    return {
+        'last_char': name[-1],
+        'last_two': name[-2:],
+        'last_three': name[-3:],
+        'first': name[0],
+        'first2': name[:2]
+    }
+
+all_names = [(i, 'm') for i in listmale] + [(i, 'f') for i in listfem]
+
+#loop to generate data for classifier
+val = 10
+failures = 0
+
+#while val <= len(all_names) * 0.8: 
+while val <= 5000: 
+    
+    random.shuffle(all_names)
+    
+    #splits feature sets into training and test sets
+    test_set = all_names[val:]
+    train_set= all_names[:val]
+    
+    # The training set is used to train a new "naive Bayes" classifier. 
+    test_set_feat = [(extract_features(n), g) for n, g in test_set]
+    train_set_feat= [(extract_features(n), g) for n, g in train_set]
+    
+    classifier = nltk.NaiveBayesClassifier.train(train_set_feat)    
+    accuracy = nltk.classify.accuracy(classifier, test_set_feat)
+    
+    accuracylist.append(accuracy)
+    valuelist.append(len(train_set))
+    
+#   val += int(len(all_names) * 0.8 * 5/100) 
+    val += 100
+    
+    error_list = []
+    error_f = 0    
+    
+    for i in test_set:
+         if classifier.classify(extract_features(i[0])) != i[1]:
+             error_list.append(i)
+       
+    for i in error_list:
+        if i[1] == 'f': 
+            error_f += 1
+            
+    print(error_list)
+    print(error_f)
+    print(len(error_list)-error_f)
+    print(len(test_set))
+    print(len(error_list)/len(test_set))
+    
+
+    
+    
+    
+
+import matplotlib.pyplot as plt
+
+x = valuelist
+y = accuracylist
+
+plt.ylim(0,1)
+plt.xlim(0,len(all_names) * 0.8)
+
+plt.scatter(x,y)
+plt.show()
+
+print(classifier.classify(extract_features(testname)))
 #print(frequencyDict[0])
 #    
 #    #columns = line.split(' ') # ',' or '\t' or ' ' etc...
