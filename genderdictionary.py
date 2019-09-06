@@ -112,6 +112,7 @@ for [name, frequencies] in shortNames:
 #print(russianpop)
 
 #Sorts names for male and female with values 
+                
 for key in genderDict.keys():
         if 'M' in genderDict[key]:
             listmale.append(key) 
@@ -124,26 +125,50 @@ import random
 
 testname = 'Phillip'
 
+#removes vowels for feature extraction
+def remove_vowels(s):
+    vowels = "aeiouAEIOU"
+    s_without_vowels = ""
+    for letter in s:
+        if letter not in vowels:
+            s_without_vowels += letter
+    return s_without_vowels
+
+def only_vowels(s):
+    vowels = "aeiouAEIOU"
+    only_vowels = ""
+    for letter in s:
+        if letter in vowels:
+            only_vowels += letter
+    return only_vowels
+
+
 #extracts features from labeled_names names 
 def extract_features(name):
     
     name = name.lower()
     return {
         'last_char': name[-1],
-        'last_two': name[-2:],
+        #'last_two': name[-2:],
         'last_three': name[-3:],
         'first': name[0],
-        'first2': name[:2]
+        #'first2': name[:2],
+        'first3': name[:3],
+        'no_vowels': remove_vowels(name),
+        'only_vowels': only_vowels(name),
     }
 
 all_names = [(i, 'm') for i in listmale] + [(i, 'f') for i in listfem]
 
 #loop to generate data for classifier
-val = 10
-failures = 0
 
-#while val <= len(all_names) * 0.8: 
-while val <= 5000: 
+#while val <= len(all_names) * 0.8:
+
+num_error_f = []
+num_error_m = []
+    
+for x in range(0, 10):
+    val = 2000
     
     random.shuffle(all_names)
     
@@ -162,42 +187,43 @@ while val <= 5000:
     valuelist.append(len(train_set))
     
 #   val += int(len(all_names) * 0.8 * 5/100) 
-    val += 100
-    
+    #val += 100
     error_list = []
-    error_f = 0    
+    error_f = []
+    error_m = []
     
     for i in test_set:
          if classifier.classify(extract_features(i[0])) != i[1]:
              error_list.append(i)
        
+    #Create list off female and male erros        
     for i in error_list:
         if i[1] == 'f': 
-            error_f += 1
-            
-    print(error_list)
-    print(error_f)
-    print(len(error_list)-error_f)
-    print(len(test_set))
-    print(len(error_list)/len(test_set))
-    
-
-    
-    
-    
+            error_f.append(i)
+        else:
+            error_m.append(i)
+           
+    num_error_f.append(len(error_f))
+    num_error_m.append(len(error_m))
+                      
 
 import matplotlib.pyplot as plt
 
-x = valuelist
-y = accuracylist
+x = num_error_f
+y = num_error_m
 
-plt.ylim(0,1)
-plt.xlim(0,len(all_names) * 0.8)
+plt.xlim(0,max(x))
+plt.ylim(0,max(y))
 
 plt.scatter(x,y)
 plt.show()
 
 print(classifier.classify(extract_features(testname)))
+print(error_list)
+print(error_f)
+print(len(error_m))
+print(len(test_set))
+print(len(error_list)/len(test_set))  
 #print(frequencyDict[0])
 #    
 #    #columns = line.split(' ') # ',' or '\t' or ' ' etc...
