@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Sep 10 14:07:15 2019
+
+@author: tickc
+"""
+
 
 import csv
 with open('C:/Users/tickc/OneDrive/Documents/GitHub/gender/data/country_pop.csv') as g:
@@ -102,8 +109,6 @@ import nltk
 import random
 
 
-testname = 'Phillip'
-
 #removes vowels for feature extraction
 def remove_vowels(s):
     vowels = "aeiouAEIOU"
@@ -141,15 +146,8 @@ all_names = [(i, 'm') for i in listmale] + [(i, 'f') for i in listfem]
 
 #while val <= len(all_names) * 0.8:
 
-num_error_f = []
-num_error_m = []
-num_true_f = []
-num_true_m = []
 
-num_pre_con_f = []
-num_pre_con_m = []
-
-for x in range(0, 10):
+for x in range(0, 1):
     val = 2000
     
     random.shuffle(all_names)
@@ -165,75 +163,17 @@ for x in range(0, 10):
     classifier = nltk.NaiveBayesClassifier.train(train_set_feat)    
     accuracy = nltk.classify.accuracy(classifier, test_set_feat)
     
-    accuracylist.append(accuracy)
-    
-    
-    
-#   val += int(len(all_names) * 0.8 * 5/100) 
-    #val += 100
-    error_list = []
-    error_f = []
-    error_m = []
-    
-    true_list = []
-    true_f = []
-    true_m = []
-    
-    pre_con_f = []
-    pre_con_m = []
-
-    
-    for i in test_set:
-         if i[1] == 'f':
-             pre_con_f.append(i)
-         else: 
-             pre_con_m.append(i)
-        
-             
-    for i in test_set:
-         if classifier.classify(extract_features(i[0])) != i[1]:
-             error_list.append(i)
-         else: 
-             true_list.append(i)
-                
-    #Create list off female and male erros        
-    for i in error_list:
-        if i[1] == 'f': 
-            error_f.append(i)
-        else:
-            error_m.append(i)
+def genderize(name):
+    for key in genderDict.keys():
+        for key in genderDict.keys():
+            if name in genderDict.keys():
+                if key == 'M':
+                    return 'm'
+                else:
+                    return 'f'
+            if name not in genderDict.keys():
+                return classifier.classify(extract_features(name))
             
-    for i in true_list:
-            if i[1] == 'f': 
-                true_f.append(i)
-            else:
-                true_m.append(i)          
-           
-    num_error_f.append(len(error_f))
-    num_error_m.append(len(error_m))
-    num_true_f.append(len(true_f))
-    num_true_m.append(len(true_m))                  
-    num_pre_con_f.append(len(pre_con_f))
-    num_pre_con_m.append(len(pre_con_m))
-    
-import matplotlib.pyplot as plt
-import numpy as np
 
-y = np.divide(num_true_f,num_pre_con_f)
-x = np.divide(num_error_f,num_pre_con_m)
-
-y1 = np.divide(num_true_m,num_pre_con_m)
-x1 = np.divide(num_error_m,num_pre_con_f)
-    
-plt.scatter(x,y)
-plt.scatter(x1,y1)
-plt.show()
-
-print(classifier.classify(extract_features(testname)))
-print(error_list)
-print(error_f)
-print(len(error_m))
-print(len(test_set))
-print(len(error_list)/len(test_set))  
 
     
