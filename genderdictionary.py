@@ -105,37 +105,6 @@ import random
 testname = 'Phillip'
 
 #removes vowels for feature extraction
-def remove_vowels(s):
-    vowels = "aeiouAEIOU"
-    s_without_vowels = ""
-    for letter in s:
-        if letter not in vowels:
-            s_without_vowels += letter
-    return s_without_vowels
-
-def only_vowels(s):
-    vowels = "aeiouAEIOU"
-    only_vowels = ""
-    for letter in s:
-        if letter in vowels:
-            only_vowels += letter
-    return only_vowels
-
-def extract_features(name):
-    
-    name = name.lower()
-    return {
-        'last_char': name[-1],
-        'last_two': name[-2:],
-        'last_three': name[-3:],
-        'first': name[0],
-        'first2': name[:2],
-        'first3': name[:3],
-        'no_vowels': remove_vowels(name),
-        'only_vowels': only_vowels(name),
-    }
-
-all_names = [(i, 'm') for i in listmale] + [(i, 'f') for i in listfem]
 
 #loop to generate data for classifier
 
